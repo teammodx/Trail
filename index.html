@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer with Particle Effect</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: #111;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        #timer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            color: white;
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        .result {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            color: white;
+            border: 3px solid black;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .line {
+            position: absolute;
+            border-top: 3px solid black;
+            width: 100%;
+            top: 50%;
+        }
+    </style>
+</head>
+<body>
+
+<div id="timer"></div>
+<div class="line"></div>
+<div id="resultHistory"></div>
+
+<script>
+    // Timer logic
+    let timerElement = document.getElementById('timer');
+    let resultHistoryElement = document.getElementById('resultHistory');
+    let timeLeft = 60;
+    let interval;
+
+    function updateTimer() {
+        timeLeft--;
+        timerElement.textContent = `Time Left: ${timeLeft}s`;
+
+        if (timeLeft <= 0) {
+            clearInterval(interval);
+            addRandomResult();
+            timeLeft = 60; // Reset timer
+            interval = setInterval(updateTimer, 1000);
+        }
+    }
+
+    interval = setInterval(updateTimer, 1000);
+
+    // Particle effect
+    function createParticle() {
+        let particle = document.createElement('div');
+        particle.classList.add('particle');
+        particle.style.width = `${Math.random() * 10 + 5}px`;
+        particle.style.height = particle.style.width;
+        particle.style.backgroundColor = getRandomColor();
+        particle.style.left = `${Math.random() * window.innerWidth}px`;
+        particle.style.top = `${Math.random() * window.innerHeight}px`;
+        document.body.appendChild(particle);
+
+        let moveX = Math.random() * 2 - 1;
+        let moveY = Math.random() * 2 - 1;
+        let size = parseFloat(particle.style.width);
+
+        setInterval(() => {
+            particle.style.left = parseFloat(particle.style.left) + moveX + 'px';
+            particle.style.top = parseFloat(particle.style.top) + moveY + 'px';
+        }, 10);
+
+        setTimeout(() => {
+            particle.remove();
+        }, 5000); // Particle disappears after 5 seconds
+    }
+
+    function getRandomColor() {
+        const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#8B00FF'];
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    setInterval(createParticle, 100);
+
+    // Add random result
+    function addRandomResult() {
+        let result = document.createElement('div');
+        result.classList.add('result');
+        result.style.fontSize = `${Math.random() * 30 + 10}px`;
+        result.textContent = `Result: ${Math.random().toFixed(2)}`;
+        resultHistoryElement.appendChild(result);
+    }
+</script>
+
+</body>
+</html>
