@@ -3,123 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEAM EARNING FREE MOD</title>
+    <title>Random Timer Results</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #111;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
             margin: 0;
-        }
-
-        h1 {
-            color: transparent;
-            background: linear-gradient(90deg, red, green);
-            -webkit-background-clip: text;
-            font-size: 36px;
-            margin-bottom: 20px;
-        }
-
-        .timer-box {
-            width: 200px;
-            height: 200px;
-            border: 3px solid transparent;
-            background: linear-gradient(90deg, red, green);
+            padding: 0;
+            height: 100vh;
+            background-color: #111;
             display: flex;
-            align-items: center;
             justify-content: center;
-            font-size: 24px;
-            cursor: pointer;
-            margin: 20px;
-            transition: transform 0.3s;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .timer-box:hover {
-            transform: scale(1.1);
+        /* Gradient border on the sides */
+        .gradient-border {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(45deg, #808080, #d3d3d3);
+            z-index: -1;
+            padding: 5px;
         }
 
-        .history {
-            max-height: 300px;
-            width: 300px;
-            overflow-y: auto;
-            margin-top: 20px;
-            padding: 10px;
-            border: 2px solid #fff;
-            background-color: #333;
-        }
-
-        .result {
-            margin: 5px;
-            padding: 10px;
+        .content {
             text-align: center;
-            border-radius: 5px;
-            border: 1px solid #fff;
-        }
-
-        .big {
-            font-size: 40px;
-            background-color: #00FF00;
-        }
-
-        .small {
-            font-size: 20px;
-            background-color: #FF0000;
+            color: white;
+            padding: 20px;
+            width: 80%;
+            max-width: 500px;
+            border: 3px solid #fff;
+            border-radius: 8px;
         }
 
         #timerDisplay {
             font-size: 30px;
-            color: #fff;
+            margin-bottom: 20px;
         }
+
+        .result-history {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+            padding: 10px;
+            border-top: 2px solid #fff;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .result {
+            margin: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 18px;
+            color: #fff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .big {
+            font-size: 40px;
+            background: linear-gradient(45deg, #ff4500, #ffd700);
+        }
+
+        .small {
+            font-size: 18px;
+            background: linear-gradient(45deg, #00bfff, #32cd32);
+        }
+
+        .dot {
+            position: absolute;
+            border-radius: 50%;
+            background-color: #ff1493;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
     </style>
 </head>
 <body>
 
-<h1>TEAM EARNING FREE MOD</h1>
+<!-- Gradient border around the page -->
+<div class="gradient-border"></div>
 
-<div class="timer-box" onclick="startTimer(30)">
-    <div id="timerDisplay">30s</div>
-</div>
-
-<div class="timer-box" onclick="startTimer(60)">
-    <div id="timerDisplay">1m</div>
-</div>
-
-<div class="history" id="history">
-    <h3>Result History:</h3>
-    <div id="historyResults"></div>
+<div class="content">
+    <h1>Random Timer Results</h1>
+    <div id="timerDisplay">Timer: 01:00</div>
+    <div id="historyResults" class="result-history">
+        <h3>History</h3>
+    </div>
 </div>
 
 <script>
-    let timerInterval;
-    let historyContainer = document.getElementById('historyResults');
-    let timerDisplay = document.getElementById('timerDisplay');
     let resultHistory = [];
+    let timerDisplay = document.getElementById('timerDisplay');
+    let historyContainer = document.getElementById('historyResults');
 
-    function startTimer(seconds) {
-        let timeLeft = seconds;
-        let timerElement = document.createElement('div');
-        timerElement.textContent = `${timeLeft} seconds`;
-        let endTime = Date.now() + timeLeft * 1000;
+    // Function to start the timer
+    function startTimer() {
+        let timeLeft = 60; // 1 minute timer
+        let interval = setInterval(() => {
+            let minutesLeft = Math.floor(timeLeft / 60);
+            let secondsLeft = timeLeft % 60;
+            timerDisplay.textContent = `Timer: ${String(minutesLeft).padStart(2, '0')}:${String(secondsLeft).padStart(2, '0')}`;
+            timeLeft--;
 
-        timerInterval = setInterval(() => {
-            let remainingTime = Math.max(0, endTime - Date.now());
-            let remainingSeconds = Math.floor(remainingTime / 1000);
-            let minutesLeft = Math.floor(remainingSeconds / 60);
-            let secondsLeftDisplay = remainingSeconds % 60;
-            timerDisplay.textContent = `${String(minutesLeft).padStart(2, '0')}:${String(secondsLeftDisplay).padStart(2, '0')}`;
-
-            if (remainingTime <= 0) {
-                clearInterval(timerInterval);
+            if (timeLeft < 0) {
+                clearInterval(interval);
                 generateRandomResult();
             }
         }, 1000);
     }
 
+    // Function to generate a random result (Big or Small)
     function generateRandomResult() {
         let resultSize = Math.random() < 0.5 ? 'big' : 'small';
         let randomValue = Math.random().toFixed(2);
@@ -132,13 +131,48 @@
         updateHistory();
     }
 
+    // Update history
     function updateHistory() {
-        let historyHtml = '';
+        historyContainer.innerHTML = '<h3>History</h3>';
         for (let i = 0; i < resultHistory.length; i++) {
-            historyHtml += `<div class="result">${resultHistory[i]}</div>`;
+            let historyItem = document.createElement('div');
+            historyItem.classList.add('result');
+            historyItem.textContent = resultHistory[i];
+            historyContainer.appendChild(historyItem);
         }
-        historyContainer.innerHTML = historyHtml;
     }
+
+    // Function to create a random dot
+    function createDot() {
+        let dot = document.createElement('div');
+        let size = Math.random() * 10 + 5;
+        dot.style.width = `${size}px`;
+        dot.style.height = `${size}px`;
+        dot.style.left = `${Math.random() * window.innerWidth}px`;
+        dot.style.top = `${Math.random() * window.innerHeight}px`;
+        document.body.appendChild(dot);
+
+        let moveX = Math.random() * 2 - 1;
+        let moveY = Math.random() * 2 - 1;
+
+        setInterval(() => {
+            dot.style.left = parseFloat(dot.style.left) + moveX + 'px';
+            dot.style.top = parseFloat(dot.style.top) + moveY + 'px';
+        }, 30);
+
+        setTimeout(() => {
+            dot.remove();
+        }, 5000); // Dot disappears after 5 seconds
+    }
+
+    // Create dots periodically
+    setInterval(createDot, 100);
+
+    // Start timer automatically when page loads
+    window.onload = () => {
+        startTimer();
+    };
+
 </script>
 
 </body>
