@@ -3,114 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timer with Particle Effect</title>
+    <title>Timer with Random Results</title>
     <style>
         body {
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: white;
             margin: 0;
             padding: 0;
             height: 100vh;
-            background-color: #111;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
-        #timer {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 24px;
+        button {
+            padding: 20px 30px;
+            font-size: 18px;
+            margin: 10px;
+            cursor: pointer;
+            background-color: #444;
             color: white;
+            border: 2px solid #fff;
+            border-radius: 5px;
+            transition: background-color 0.3s;
         }
-        .particle {
-            position: absolute;
-            border-radius: 50%;
-            opacity: 0.7;
-            pointer-events: none;
+        button:hover {
+            background-color: #666;
+        }
+        #timerDisplay {
+            font-size: 30px;
+            margin: 20px;
+        }
+        .history {
+            max-height: 200px;
+            overflow-y: auto;
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            border: 2px solid #fff;
+            background-color: #333;
         }
         .result {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 20px;
-            color: white;
-            border: 3px solid black;
+            margin: 5px;
             padding: 10px;
-            margin-top: 10px;
-        }
-        .line {
-            position: absolute;
-            border-top: 3px solid black;
-            width: 100%;
-            top: 50%;
+            border-radius: 5px;
+            border: 1px solid #fff;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
-<div id="timer"></div>
-<div class="line"></div>
-<div id="resultHistory"></div>
+<h1>Timer and Random Results</h1>
+
+<button onclick="startTimer(1)">1 Minute Timer</button>
+<button onclick="startTimer(3)">3 Minute Timer</button>
+<button onclick="startTimer(5)">5 Minute Timer</button>
+
+<div id="timerDisplay">Timer: 00:00</div>
+
+<div class="history" id="history">
+    <h3>Result History:</h3>
+    <div id="historyResults"></div>
+</div>
 
 <script>
-    // Timer logic
-    let timerElement = document.getElementById('timer');
-    let resultHistoryElement = document.getElementById('resultHistory');
-    let timeLeft = 60;
-    let interval;
+    let timerInterval;
+    let historyContainer = document.getElementById('historyResults');
+    let timerDisplay = document.getElementById('timerDisplay');
+    let resultHistory = [];
 
-    function updateTimer() {
-        timeLeft--;
-        timerElement.textContent = `Time Left: ${timeLeft}s`;
+    function startTimer(minutes) {
+        let secondsLeft = minutes * 60;
+        let endTime = Date.now() + secondsLeft * 1000;
 
-        if (timeLeft <= 0) {
-            clearInterval(interval);
-            addRandomResult();
-            timeLeft = 60; // Reset timer
-            interval = setInterval(updateTimer, 1000);
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            let remainingTime = Math.max(0, endTime - Date.now());
+            let remainingSeconds = Math.floor(remainingTime / 1000);
+            let minutesLeft = Math.floor(remainingSeconds / 60);
+            let secondsLeftDisplay = remainingSeconds % 60;
+            timerDisplay.textContent = `Timer: ${String(minutesLeft).padStart(2, '0')}:${String(secondsLeftDisplay).padStart(2, '0')}`;
+
+            if (remainingTime <= 0) {
+                clearInterval(timerInterval);
+                generateResult(minutes);
+            }
+        }, 1000);
+    }
+
+    function generateResult(minutes) {
+        let resultSize = Math.random() < 0.5 ? 'big' : 'small';
+        let randomValue = Math.random().toFixed(2);
+        let resultElement = document.createElement('div');
+        resultElement.classList.add('result');
+        resultElement.textContent = `Result: ${randomValue}`;
+
+        if (resultSize === 'big') {
+            resultElement.style.fontSize = '40px';
+            resultElement.style.backgroundColor = '#00FF00';
+        } else {
+            resultElement.style.fontSize = '20px';
+            resultElement.style.backgroundColor = '#FF0000';
         }
+
+        resultHistory.push(resultElement.textContent);
+        historyContainer.appendChild(resultElement);
+        updateHistory();
     }
 
-    interval = setInterval(updateTimer, 1000);
-
-    // Particle effect
-    function createParticle() {
-        let particle = document.createElement('div');
-        particle.classList.add('particle');
-        particle.style.width = `${Math.random() * 10 + 5}px`;
-        particle.style.height = particle.style.width;
-        particle.style.backgroundColor = getRandomColor();
-        particle.style.left = `${Math.random() * window.innerWidth}px`;
-        particle.style.top = `${Math.random() * window.innerHeight}px`;
-        document.body.appendChild(particle);
-
-        let moveX = Math.random() * 2 - 1;
-        let moveY = Math.random() * 2 - 1;
-        let size = parseFloat(particle.style.width);
-
-        setInterval(() => {
-            particle.style.left = parseFloat(particle.style.left) + moveX + 'px';
-            particle.style.top = parseFloat(particle.style.top) + moveY + 'px';
-        }, 10);
-
-        setTimeout(() => {
-            particle.remove();
-        }, 5000); // Particle disappears after 5 seconds
-    }
-
-    function getRandomColor() {
-        const colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#8B00FF'];
-        return colors[Math.floor(Math.random() * colors.length)];
-    }
-
-    setInterval(createParticle, 100);
-
-    // Add random result
-    function addRandomResult() {
-        let result = document.createElement('div');
-        result.classList.add('result');
-        result.style.fontSize = `${Math.random() * 30 + 10}px`;
-        result.textContent = `Result: ${Math.random().toFixed(2)}`;
-        resultHistoryElement.appendChild(result);
+    function updateHistory() {
+        let historyHtml = '';
+        for (let i = 0; i < resultHistory.length; i++) {
+            historyHtml += `<div class="result">${resultHistory[i]}</div>`;
+        }
+        historyContainer.innerHTML = historyHtml;
     }
 </script>
 
